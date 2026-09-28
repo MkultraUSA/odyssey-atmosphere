@@ -36,13 +36,45 @@ Item {
   ]
 
   // Never autoplays. Sound starts only when explicitly asked for.
-  property bool playing: false
+  //
+  // `wanted` is what the user asked for; `playing` is what is actually
+  // running. They differ when the active theme is not Odyssey: the request is
+  // remembered and honoured as soon as the Odyssey theme comes back, which is
+  // the behaviour the base plugin gets for free by being theme-scoped.
+  property bool wanted: false
+  property string activeTheme: ""
+  readonly property bool themeActive: activeTheme === "odyssey"
+  readonly property bool playing: wanted && themeActive
+
   property int index: 0
   property real master: 0.9
   // 0 = slotA at full, 1 = slotB at full.
   property real crossfade: 0
   property int repeatsPerTrack: 2
   property string lastError: ""
+
+  readonly property string stateHome: (Quickshell.env("XDG_STATE_HOME")
+    || Quickshell.env("HOME") + "/.local/state") + "/omarchy/current"
+
+  // Reconcile actual playback with the request and the theme gate. Called on
+  // every transition, so it is safe to call redundantly.
+  function applyState() {
+    if (playing) {
+      if (slotA.status !== MediaPlayer.PlayingState) {
+        if (slotA.source === "") slotA.source = url_for(currentTrack)
+        slotA.play()
+        armDwell()
+      }
+    } else {
+      slotA.pause()
+      dwell.stop()
+      fade.stop()
+    }
+  }
+
+  function readActiveTheme() {
+    themeProc.running = true
+  }
 
   readonly property string currentTrack: tracks.length ? tracks[index] : ""
   readonly property int trackCount: tracks.length
@@ -103,17 +135,16 @@ Item {
 
   function play() {
     if (trackCount === 0) return
-    if (!playing) {
+    if (!wanted) {
       slotA.source = url_for(currentTrack)
       crossfade = 0
-      playing = true
     }
-    slotA.play()
-    armDwell()
+    wanted = true
+    applyState()
   }
 
   function pause() {
-    playing = false
+    wanted = false
     slotA.pause()
     slotB.pause()
     dwell.stop()
@@ -121,7 +152,7 @@ Item {
   }
 
   function toggle() {
-    playing ? pause() : play()
+    wanted ? pause() : play()
   }
 
   // Crossfade into the next track. SlotB becomes the live player, so the
@@ -226,6 +257,30 @@ Item {
     id: proc
   }
 
+  // Theme gate. The base plugin stops with its theme; this reads the same
+  // theme.name omarchy-theme-set writes, and reconciles playback when it moves.
+  Process {
+    id: themeProc
+    command: ["bash", "-c", "cat '" + root.stateHome + "/theme.name' 2>/dev/null"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var name = String(text || "").trim()
+        if (name && name !== root.activeTheme) {
+          root.activeTheme = name
+          root.applyState()
+        }
+      }
+    }
+  }
+
+  FileView {
+    path: root.stateHome
+    watchChanges: true
+    printErrors: false
+    onFileChanged: root.readActiveTheme()
+  }
+
   IpcHandler {
     target: "odyssey"
 
@@ -262,6 +317,9 @@ Item {
     function status(): string {
       return JSON.stringify({
         playing: root.playing,
+        wanted: root.wanted,
+        themeActive: root.themeActive,
+        activeTheme: root.activeTheme,
         scene: root.scene,
         scenes: root.scenes.map(function(s) { return s.name }),
         index: root.index,
