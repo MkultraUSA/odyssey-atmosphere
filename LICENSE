@@ -1,6 +1,24 @@
+Odyssey Atmosphere is distributed under the MIT License.
+
+  Copyright (c) 2026 Kevin Watkins
+
+This work is an adaptation of, and substantially derived from:
+
+  Hydropunk Atmosphere
+  Copyright (c) 2026 terrizoaguimor
+  https://github.com/terrizoaguimor/omarchy-hydropunk-atmosphere
+  Licensed under the MIT License
+
+Derived elements include the plugin manifest shape, the Qt.resolvedUrl asset
+path convention, the IPC target pattern, the two-player crossfade arrangement,
+and the seamless-loop acceptance criteria. The upstream MIT notice is
+reproduced below as required.
+
+--------------------------------------------------------------------------
+
 MIT License
 
-Copyright (c) 2026 Kevin Watkins
+Copyright (c) 2026 terrizoaguimor (Hydropunk Atmosphere)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +38,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
----
+--------------------------------------------------------------------------
 
 AUDIO LICENSING
 
