@@ -56,8 +56,15 @@ Item {
   ]
   property string scene: "lens"
 
-  readonly property string backgroundDir: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state")
-    + "/omarchy/current/theme/backgrounds/"
+  // Wallpapers are bundled with the plugin rather than read from the active
+  // theme. Reaching into ~/.local/state/omarchy/current/theme meant scene
+  // selection silently did nothing for anyone whose theme did not happen to
+  // contain a file of the same name — which is everyone but the author.
+  // Qt.resolvedUrl gives a file:// URL; the shell command needs a path.
+  function localBackground(name) {
+    var u = String(Qt.resolvedUrl("assets/backgrounds/" + name))
+    return u.indexOf("file://") === 0 ? u.slice(7) : u
+  }
 
   function sceneIndex(name) {
     for (var i = 0; i < scenes.length; i++)
@@ -70,7 +77,7 @@ Item {
     var i = sceneIndex(name)
     if (i < 0) return
     scene = name
-    run("omarchy-theme-bg-set " + backgroundDir + scenes[i].background)
+    run("omarchy-theme-bg-set " + localBackground(scenes[i].background))
     var t = tracks.indexOf(scenes[i].track)
     if (t >= 0) {
       index = t
