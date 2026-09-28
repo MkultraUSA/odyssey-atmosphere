@@ -15,13 +15,13 @@
 > credited above is theirs.
 
 Public-domain classical music for the Omarchy screensaver, crossfaded one track
-at a time.
+at a time. A bar widget opens a small panel where a **scene** selector changes
+the wallpaper and the music together.
 
-This is an audio-only plugin. It adds no panel and no bar widget; it runs as a
-background service and is driven over IPC. It has **no runtime dependencies** —
-no other plugin, no network access, no build step, no shell-outs. If the
-Hydropunk Atmosphere plugin is also installed, the two simply share the screen;
-Odyssey Atmosphere works on its own without it.
+This plugin adds a bar widget and a panel alongside its background service. It
+has **no runtime dependencies** — no other plugin, no network access, no build
+step, no shell-outs. If the Hydropunk Atmosphere plugin is also installed, the
+two simply share the screen; Odyssey Atmosphere works on its own without it.
 
 ## Install
 
@@ -30,11 +30,32 @@ omarchy plugin add <this-repo-url>
 omarchy plugin enable io.github.mkultrausa.odyssey-atmosphere
 ```
 
+## Use
+
+Sound **never autoplays**. It starts only when you ask for it.
+
+Click the red lens in the bar for the panel:
+
+- **SCENE** — switches wallpaper and music together, the way the base plugin
+  couples a scene to an audio preset
+- **SOUND** — play/pause, previous, next, with the current track shown
+
+Or drive it from the command line:
+
+```bash
+omarchy-shell odyssey play       # start
+omarchy-shell odyssey pause      # stop
+omarchy-shell odyssey next       # crossfade to the next track
+omarchy-shell odyssey previous   # crossfade to the previous track
+omarchy-shell odyssey setscene lens
+omarchy-shell odyssey status     # scene, track, position, duration
+```
+
 ## Remove
 
 ```bash
-omarchy plugin disable odyssey.atmosphere
-omarchy plugin remove odyssey.atmosphere
+omarchy plugin disable io.github.mkultrausa.odyssey-atmosphere
+omarchy plugin remove io.github.mkultrausa.odyssey-atmosphere
 ```
 
 To uninstall completely, delete the plugin directory as well:
@@ -47,17 +68,16 @@ The plugin stores no state outside its own directory. It reads no user
 configuration and writes none, so removal leaves nothing behind. Audio is
 bundled in the repository, so there is no cache to clear.
 
-## Use
+## Scenes
 
-Sound **never autoplays**. It starts only when you ask for it.
+A scene pairs a picture with a track, so picking one changes both. Three scenes
+cannot own six tracks, so a separate track selector keeps every loop reachable
+and a scene is a starting point rather than a cage.
 
-```bash
-omarchy-shell odyssey play       # start
-omarchy-shell odyssey pause      # stop
-omarchy-shell odyssey next       # crossfade to the next track
-omarchy-shell odyssey previous   # crossfade to the previous track
-omarchy-shell odyssey status     # current track, position, duration
-```
+| Scene | Wallpaper | Starts on |
+|---|---|---|
+| `lens` | `01-lens.webp` | Satie, Gymnopédie No. 1 |
+| `monolith` | `03-monolith.webp` | Beethoven, Eroica II, Marcia funebre |
 
 ## How it plays music
 
@@ -119,7 +139,9 @@ installed together or separately.
 
 **This derivative:** `MediaPlayer` playback in place of `SoundEffect`, a
 one-at-a-time crossfaded queue in place of the three-stem gain mixer, a
-public-domain classical tracklist, and a rebuilt manifest — by Kevin Watkins.
+public-domain classical tracklist, a scene layer pairing wallpaper with music,
+and a bar widget and panel whose structure follows the base plugin's — by
+Kevin Watkins.
 
 **Bundled third-party assets:** six public-domain classical recordings, carried in
 `assets/audio/`. These are the only non-original files in the repository. Each

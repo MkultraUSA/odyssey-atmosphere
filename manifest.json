@@ -5,11 +5,22 @@
   "version": "0.1.0",
   "author": "terrizoaguimor (Hydropunk Atmosphere) - adapted by Kevin Watkins",
   "license": "MIT",
-  "description": "Public-domain classical music for the screensaver, crossfaded one track at a time.",
+  "description": "Public-domain classical music for the screensaver, crossfaded one track at a time, with a scene selector that changes wallpaper and music together.",
   "kinds": [
-    "service"
+    "service",
+    "bar-widget",
+    "panel"
   ],
   "entryPoints": {
-    "service": "Service.qml"
+    "service": "Service.qml",
+    "barWidget": "Widget.qml",
+    "panel": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Odyssey",
+    "description": "Scene and sound control for Odyssey Atmosphere",
+    "category": "Desktop",
+    "allowMultiple": false,
+    "defaultSection": "right"
   }
 }

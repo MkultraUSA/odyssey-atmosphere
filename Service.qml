@@ -2,7 +2,6 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtMultimedia
-
 // Odyssey Atmosphere — Phase 0+1 milestone.
 //
 // Audio only, on the existing Hydropunk visuals. Every track is a verified
@@ -47,6 +46,49 @@ Item {
 
   readonly property string currentTrack: tracks.length ? tracks[index] : ""
   readonly property int trackCount: tracks.length
+
+  // Scenes pair a picture with a track. Picking one changes both together,
+  // the way the base plugin couples a scene to an audio preset. next() still
+  // reaches all six tracks, so the scene is a starting point, not a cage.
+  readonly property var scenes: [
+    { name: "lens",     label: "Lens",     background: "01-lens.webp",     track: "satie-gymnopedie-1-loop-32s.wav" },
+    { name: "monolith", label: "Monolith", background: "03-monolith.webp", track: "eroica-marcia-funebre-loop-46s.wav" }
+  ]
+  property string scene: "lens"
+
+  readonly property string backgroundDir: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state")
+    + "/omarchy/current/theme/backgrounds/"
+
+  function sceneIndex(name) {
+    for (var i = 0; i < scenes.length; i++)
+      if (scenes[i].name === name) return i
+    return -1
+  }
+
+  // Change picture and music together.
+  function setScene(name) {
+    var i = sceneIndex(name)
+    if (i < 0) return
+    scene = name
+    run("omarchy-theme-bg-set " + backgroundDir + scenes[i].background)
+    var t = tracks.indexOf(scenes[i].track)
+    if (t >= 0) {
+      index = t
+      if (playing) {
+        slotA.stop()
+        slotA.source = url_for(currentTrack)
+        slotA.play()
+        armDwell()
+      } else {
+        slotA.source = url_for(currentTrack)
+      }
+    }
+  }
+
+  function run(cmd) {
+    proc.command = ["bash", "-c", cmd + " >/dev/null 2>&1"]
+    proc.running = true
+  }
 
   function url_for(track) {
     return assetBase + track
@@ -173,6 +215,10 @@ Item {
     onErrorOccurred: root.noteError("slotB")
   }
 
+  Process {
+    id: proc
+  }
+
   IpcHandler {
     target: "odyssey"
 
@@ -201,9 +247,16 @@ Item {
       return "ok"
     }
 
+    function setscene(name: string): string {
+      root.setScene(name)
+      return "ok"
+    }
+
     function status(): string {
       return JSON.stringify({
         playing: root.playing,
+        scene: root.scene,
+        scenes: root.scenes.map(function(s) { return s.name }),
         index: root.index,
         track: root.currentTrack,
         trackCount: root.trackCount,
