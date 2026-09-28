@@ -1,5 +1,19 @@
 # Odyssey Atmosphere
 
+> **Adapted from [Hydropunk Atmosphere](https://github.com/terrizoaguimor/omarchy-hydropunk-atmosphere)
+> by [terrizoaguimor](https://github.com/terrizoaguimor), MIT licensed.**
+>
+> The Hydropunk Atmosphere plugin is the original work: the concept, the panel
+> and bar-widget architecture, the audio mixing model, the shader pipeline, and
+> the seamless-loop acceptance criteria. Odyssey Atmosphere is an edited
+> derivative of it, made by Kevin Watkins. All original credit for Hydropunk
+> Atmosphere belongs to terrizoaguimor.
+>
+> What this derivative changes: long-form playback via `MediaPlayer`, a
+> one-track-at-a-time crossfaded queue in place of the three-stem mixer, a
+> public-domain classical tracklist, and a rebuilt manifest. Everything
+> credited above is theirs.
+
 Public-domain classical music for the Omarchy screensaver, crossfaded one track
 at a time.
 
@@ -96,11 +110,16 @@ derivation recipe and the acceptance criteria are documented in
 external binary, no shell command. The plugin is a single QML service plus
 bundled audio.
 
-**Adapted from** the [Hydropunk Atmosphere](https://github.com/terrizoaguimor/omarchy-hydropunk-atmosphere)
-plugin by terrizoaguimor, MIT licensed — specifically its audio architecture and
-its acceptance criteria for seamless loops. This plugin is an independent work.
-It does **not** vendor, fork, or re-skin that plugin, and it does not include any
-of its artwork or audio. The two can be installed together or separately.
+**Original work:** Hydropunk Atmosphere — concept, panel and bar-widget
+architecture, audio mixing model, shader pipeline, and loop acceptance criteria
+— © [terrizoaguimor](https://github.com/terrizoaguimor), MIT licensed.
+Odyssey Atmosphere is an edited derivative and does not vendor or re-skin it; no
+code, artwork, or audio from the original is redistributed here. The two can be
+installed together or separately.
+
+**This derivative:** `MediaPlayer` playback in place of `SoundEffect`, a
+one-at-a-time crossfaded queue in place of the three-stem gain mixer, a
+public-domain classical tracklist, and a rebuilt manifest — by Kevin Watkins.
 
 **Bundled third-party assets:** six public-domain classical recordings, carried in
 `assets/audio/`. These are the only non-original files in the repository. Each

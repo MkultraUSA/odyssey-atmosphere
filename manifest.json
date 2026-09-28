@@ -3,7 +3,7 @@
   "id": "io.github.mkultrausa.odyssey-atmosphere",
   "name": "Odyssey Atmosphere",
   "version": "0.1.0",
-  "author": "Kevin Watkins, adapted from Hydropunk Atmosphere by terrizoaguimor",
+  "author": "terrizoaguimor (Hydropunk Atmosphere) - adapted by Kevin Watkins",
   "license": "MIT",
   "description": "Public-domain classical music for the screensaver, crossfaded one track at a time.",
   "kinds": [
