@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "odyssey.atmosphere",
+  "name": "Odyssey Atmosphere",
+  "version": "0.1.0",
+  "author": "terrizoaguimor",
+  "license": "MIT",
+  "description": "Public-domain classical music for the screensaver, crossfaded one track at a time.",
+  "kinds": ["service"],
+  "entryPoints": {"service": "Service.qml"}
+}
