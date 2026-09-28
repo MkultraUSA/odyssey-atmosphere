@@ -13,7 +13,7 @@ Odyssey Atmosphere works on its own without it.
 
 ```bash
 omarchy plugin add <this-repo-url>
-omarchy plugin enable odyssey.atmosphere
+omarchy plugin enable io.github.mkultrausa.odyssey-atmosphere
 ```
 
 ## Remove
@@ -26,7 +26,7 @@ omarchy plugin remove odyssey.atmosphere
 To uninstall completely, delete the plugin directory as well:
 
 ```bash
-rm -rf ~/.config/omarchy/plugins/odyssey.atmosphere
+rm -rf ~/.config/omarchy/plugins/io.github.mkultrausa.odyssey-atmosphere
 ```
 
 The plugin stores no state outside its own directory. It reads no user
