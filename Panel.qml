@@ -110,24 +110,46 @@ Ui.Panel {
         font.pixelSize: Style.font.caption
       }
 
+      // Plain rectangles with a MouseArea rather than Ui.Button. Ui.Button
+      // declares a clicked() signal but no first-party panel uses it, and in
+      // practice it never fired here: the scene selector worked, the transport
+      // controls did not, and the same commands worked from the CLI.
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(8)
 
-        Ui.Button {
-          Layout.fillWidth: true
-          text: root.playing ? "Pause" : "Play"
-          onClicked: root.odyssey(root.playing ? "pause" : "play")
-        }
-        Ui.Button {
-          Layout.fillWidth: true
-          text: "Prev"
-          onClicked: root.odyssey("previous")
-        }
-        Ui.Button {
-          Layout.fillWidth: true
-          text: "Next"
-          onClicked: root.odyssey("next")
+        Repeater {
+          model: [
+            { label: root.playing ? "Pause" : "Play", arg: root.playing ? "pause" : "play" },
+            { label: "Prev", arg: "previous" },
+            { label: "Next", arg: "next" }
+          ]
+
+          Rectangle {
+            required property var modelData
+            Layout.fillWidth: true
+            implicitHeight: Style.space(34)
+            radius: Style.radius.small
+            color: tap.containsMouse ? Style.background.hover : Style.background.normal
+            border.width: 1
+            border.color: Style.border.normal
+
+            Text {
+              anchors.centerIn: parent
+              text: modelData.label
+              color: Style.foreground.normal
+              font.family: Style.font.body
+              font.pixelSize: Style.font.body
+            }
+
+            MouseArea {
+              id: tap
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: root.odyssey(modelData.arg)
+            }
+          }
         }
       }
 
