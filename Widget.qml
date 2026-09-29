@@ -21,8 +21,9 @@ Ui.BarWidget {
   // inside does nothing, because the root never grows to contain it: verified
   // by instrumenting Component.onCompleted, which reported contentWidth 50.5
   // while width and implicitWidth were both 0, and nothing appeared on screen.
-  implicitWidth: content.implicitWidth + Style.space(18)
+  implicitWidth: button.implicitWidth
   implicitHeight: root.vertical ? root.barSize : Style.bar.sizeHorizontal
+
 
   property bool playing: false
   property bool wanted: false
@@ -31,10 +32,9 @@ Ui.BarWidget {
   property string scene: "lens"
   property string lastError: ""
 
-  readonly property color lensColor: lastError
-    ? "#e2705a"
-    : !themeActive ? "#5c5348"
-    : playing ? "#e2703a" : "#5c5348"
+  // Always red. An earlier version dimmed the lens when the theme gate was
+  // closed, which just read as a broken widget rather than a paused state.
+  readonly property color lensColor: lastError ? "#e2705a" : playing ? "#ff8a3d" : "#a8331a"
 
   // The widget is always present whatever theme is active, so when the audio
   // gate is closed it has to say why rather than look broken.
@@ -71,12 +71,28 @@ Ui.BarWidget {
     }
   }
 
-  Odyssey.Panel {
-    id: odysseyPanel
+  Loader {
+    id: panelLoader
+    active: true
+    source: Qt.resolvedUrl("Panel.qml")
     visible: false
-    bar: root.bar
-    settings: root.settings
+    onLoaded: {
+      root.injectPanel()
+      Qt.callLater(root.injectPanel)
+    }
   }
+
+  function injectPanel() {
+    var t = panelLoader.item
+    if (!t) return
+    if ("bar" in t) t.bar = root.bar
+    if ("settings" in t) t.settings = root.settings
+    if ("anchorItem" in t) t.anchorItem = button
+    if ("hostWidget" in t) t.hostWidget = root
+  }
+
+  onBarChanged: injectPanel()
+  onSettingsChanged: injectPanel()
 
   Ui.WidgetButton {
     id: button
@@ -88,7 +104,11 @@ Ui.BarWidget {
     // Size to the content Row below. Without this the button keeps the default
     // fixedWidth of -1, and BarWidget is a bare Item whose implicit width is
     // zero, so the entire widget collapses to nothing and never appears.
-    fixedWidth: root.vertical ? root.barSize : content.implicitWidth + scaledHorizontalMargin * 2
+    // fixedWidth is what gives the button a hit area. Left to its own
+    // implicitWidth it sizes from its internal label, which is hidden, so the
+    // button is ~12px wide while the content Row draws outside it: visible
+    // text, no clickable area.
+    fixedWidth: root.vertical ? root.barSize : Math.round(content.implicitWidth + Style.space(22))
     activeFocusOnTab: true
     tooltipText: root.tooltipText
     onPressed: function(buttonCode) {
@@ -101,19 +121,31 @@ Ui.BarWidget {
     Row {
       id: content
       anchors.centerIn: parent
-      spacing: Style.space(7)
+      spacing: Style.space(11)
 
-      Ui.OpticalGlyph {
+      // A drawn disc rather than a glyph: the icon font has no U+25C9, so
+      // OpticalGlyph rendered nothing at all.
+      Rectangle {
+        id: lens
         anchors.verticalCenter: parent.verticalCenter
-        text: "◉"
+        width: Math.round(button.fontSize * 0.78)
+        height: width
+        radius: width / 2
         color: root.lensColor
-        fontSize: button.fontSize
+
+        Rectangle {
+          anchors.centerIn: parent
+          width: parent.width * 0.46
+          height: width
+          radius: width / 2
+          color: root.playing ? "#ffd9a8" : "#0a0b10"
+        }
       }
 
       Text {
         visible: root.setting("showLabel", true) && !root.vertical
         anchors.verticalCenter: parent.verticalCenter
-        text: "Odyssey"
+        text: "dyssey"
         color: button.foreground
         font.family: button.fontFamily
         font.pixelSize: button.fontSize
@@ -122,7 +154,16 @@ Ui.BarWidget {
     }
   }
 
-  function toggle() { odysseyPanel.open() }
+  // Bar.findPanelWidget discovers the panel for a widget by looking for these
+  // three names. Without them the host never finds the panel, so clicking set
+  // its internal state to open and nothing was ever mapped to a layer.
+  readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
+
+  function open() { if (panelLoader.item) panelLoader.item.open() }
+  function close() { if (panelLoader.item) panelLoader.item.close() }
+  function toggle() {
+    opened ? close() : open()
+  }
 
   Component.onCompleted: refresh()
 
