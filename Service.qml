@@ -84,7 +84,10 @@ Item {
   // reaches all six tracks, so the scene is a starting point, not a cage.
   readonly property var scenes: [
     { name: "lens",     label: "Lens",     background: "01-lens.webp",     track: "satie-gymnopedie-1-loop-32s.wav" },
-    { name: "monolith", label: "Monolith", background: "03-monolith.webp", track: "eroica-marcia-funebre-loop-46s.wav" }
+    { name: "panels",   label: "Panels",   background: "02-panels.webp",   track: "albinoni-oboe-adagio-loop-41s.wav" },
+    { name: "monolith", label: "Monolith", background: "03-monolith.webp", track: "eroica-marcia-funebre-loop-46s.wav" },
+    { name: "saturn",   label: "Saturn",   background: "04-saturn.webp",   track: "tchaikovsky-pp-1-loop-38s.wav" },
+    { name: "jupiter",  label: "Jupiter",  background: "05-jupiter.webp",  track: "goldberg-aria-musopen-loop-42s.wav" }
   ]
   property string scene: "lens"
 

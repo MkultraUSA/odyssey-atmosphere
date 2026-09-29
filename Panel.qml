@@ -28,7 +28,10 @@ Ui.Panel {
 
   property var sceneOptions: [
     { value: "lens", label: "Lens" },
+    { value: "panels", label: "Panels" },
     { value: "monolith", label: "Monolith" }
+    { value: "saturn", label: "Saturn" },
+    { value: "jupiter", label: "Jupiter" }
   ]
 
   property string scene: "lens"
@@ -74,7 +77,7 @@ Ui.Panel {
     open: root.opened
     centerOnBar: true
     focusTarget: keyCatcher
-    contentWidth: panel.fittedContentWidth(Style.space(340))
+    contentWidth: panel.fittedContentWidth(Style.space(420))
     contentHeight: panel.fittedContentHeight(content.implicitHeight)
 
     Ui.PanelKeyCatcher {
