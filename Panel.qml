@@ -20,6 +20,14 @@ Ui.Panel {
   moduleName: "io.github.mkultrausa.odyssey-atmosphere"
   manageIpc: false
 
+  // The host wraps this in a Ui.KeyboardPanel, a PanelWindow with
+  // `required property Item anchorItem`. Ui.Panel is a bare Item and does not
+  // declare it, so Widget.qml's guarded `if ("anchorItem" in t)` injection
+  // silently skipped it and the wrapper never got its anchor, so no surface was
+  // ever created. Declaring it here gives the injection something to set.
+  property Item anchorItem: null
+  property var hostWidget: null
+
   property var sceneOptions: [
     { value: "lens", label: "Lens" },
     { value: "monolith", label: "Monolith" }

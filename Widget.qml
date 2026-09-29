@@ -87,7 +87,8 @@ Ui.BarWidget {
     if (!t) return
     if ("bar" in t) t.bar = root.bar
     if ("settings" in t) t.settings = root.settings
-    if ("anchorItem" in t) t.anchorItem = button
+    t.anchorItem = button
+    t.hostWidget = root
     if ("hostWidget" in t) t.hostWidget = root
   }
 
