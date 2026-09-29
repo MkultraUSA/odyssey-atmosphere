@@ -7,26 +7,24 @@ import qs.Ui as Ui
 
 // Odyssey Atmosphere — the control surface.
 //
-// Scene selection changes the wallpaper and the music together, the way the
-// base plugin couples a scene to an audio preset. A separate track selector
-// keeps all six loops reachable, because three scenes cannot own six tracks.
+// Ui.Panel is only a container: it holds open/close state and nothing more.
+// The actual popup surface comes from a KeyboardPanel child that this file
+// declares, exactly as every first-party panel does. Omitting it is why
+// clicking set `opened` to true and produced no layer at all.
 //
-// The service is driven over the `odyssey` IPC target rather than a direct
-// object reference, so the panel reads its state from the same source of truth
-// the CLI does.
+// The service is driven over the `odyssey` IPC target, so the panel reads the
+// same state the CLI does rather than a second source of truth.
 
 Ui.Panel {
   id: root
   moduleName: "io.github.mkultrausa.odyssey-atmosphere"
   manageIpc: false
 
-  // The host wraps this in a Ui.KeyboardPanel, a PanelWindow with
-  // `required property Item anchorItem`. Ui.Panel is a bare Item and does not
-  // declare it, so Widget.qml's guarded `if ("anchorItem" in t)` injection
-  // silently skipped it and the wrapper never got its anchor, so no surface was
-  // ever created. Declaring it here gives the injection something to set.
+  // The KeyboardPanel wrapper is a PanelWindow with `required property Item
+  // anchorItem`; Widget.qml injects the button into this.
   property Item anchorItem: null
   property var hostWidget: null
+  readonly property var barIdentity: hostWidget || root
 
   property var sceneOptions: [
     { value: "lens", label: "Lens" },
@@ -68,61 +66,79 @@ Ui.Panel {
     }
   }
 
-  ColumnLayout {
-    spacing: Style.space(12)
-    width: Style.space(340)
+  Ui.KeyboardPanel {
+    id: panel
+    anchorItem: root.anchorItem
+    owner: root.barIdentity
+    bar: root.bar
+    open: root.opened
+    centerOnBar: true
+    focusTarget: keyCatcher
+    contentWidth: panel.fittedContentWidth(Style.space(340))
+    contentHeight: panel.fittedContentHeight(content.implicitHeight)
 
-    Text {
-      text: "SCENE"
-      color: Color.muted
-      font.family: Style.font.caption
-      font.pixelSize: Style.font.caption
+    Ui.PanelKeyCatcher {
+      id: keyCatcher
+      anchors.fill: parent
+      onCloseRequested: root.close()
     }
 
-    Ui.ButtonGroup {
-      Layout.fillWidth: true
-      options: root.sceneOptions
-      value: root.scene
-      onChanged: function(value) { root.odyssey("setscene " + value) }
-    }
+    ColumnLayout {
+      id: content
+      spacing: Style.space(12)
 
-    Ui.PanelSeparator {}
-
-    Text {
-      text: "SOUND"
-      color: Color.muted
-      font.family: Style.font.caption
-      font.pixelSize: Style.font.caption
-    }
-
-    RowLayout {
-      Layout.fillWidth: true
-      spacing: Style.space(8)
-
-      Ui.Button {
-        Layout.fillWidth: true
-        text: root.playing ? "Pause" : "Play"
-        onClicked: root.odyssey(root.playing ? "pause" : "play")
+      Text {
+        text: "SCENE"
+        color: Color.muted
+        font.family: Style.font.caption
+        font.pixelSize: Style.font.caption
       }
-      Ui.Button {
-        Layout.fillWidth: true
-        text: "Prev"
-        onClicked: root.odyssey("previous")
-      }
-      Ui.Button {
-        Layout.fillWidth: true
-        text: "Next"
-        onClicked: root.odyssey("next")
-      }
-    }
 
-    Text {
-      Layout.fillWidth: true
-      text: root.trackLabel
-      color: Color.muted
-      font.family: Style.font.caption
-      font.pixelSize: Style.font.caption
-      elide: Text.ElideRight
+      Ui.ButtonGroup {
+        Layout.fillWidth: true
+        options: root.sceneOptions
+        value: root.scene
+        onChanged: function(value) { root.odyssey("setscene " + value) }
+      }
+
+      Ui.PanelSeparator {}
+
+      Text {
+        text: "SOUND"
+        color: Color.muted
+        font.family: Style.font.caption
+        font.pixelSize: Style.font.caption
+      }
+
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: Style.space(8)
+
+        Ui.Button {
+          Layout.fillWidth: true
+          text: root.playing ? "Pause" : "Play"
+          onClicked: root.odyssey(root.playing ? "pause" : "play")
+        }
+        Ui.Button {
+          Layout.fillWidth: true
+          text: "Prev"
+          onClicked: root.odyssey("previous")
+        }
+        Ui.Button {
+          Layout.fillWidth: true
+          text: "Next"
+          onClicked: root.odyssey("next")
+        }
+      }
+
+      Text {
+        Layout.fillWidth: true
+        text: root.trackLabel
+        color: Color.muted
+        font.family: Style.font.caption
+        font.pixelSize: Style.font.caption
+        elide: Text.ElideRight
+      }
     }
   }
 
